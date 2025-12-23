@@ -121,6 +121,46 @@
     <!-- APP ENGINE -->
     <script defer src="https://tv.scdn.co/webos4plus/v2/593b9e7/js/vendors.c2b961bdd56f55fcfed5.js"></script>
     <script defer src="https://tv.scdn.co/webos4plus/v2/593b9e7/js/spotifytv.js"></script>
+<script>
+    // --- STREMIO 1080p EMULATOR ---
+    (function() {
+        // 1. Detect if we need to apply the fix
+        // (Check for Hisense TV OR if the screen height implies 720p)
+        var isTV = navigator.userAgent.indexOf('Hisense') > -1 || 
+                   navigator.userAgent.indexOf('Vidaa') > -1 ||
+                   window.innerHeight <= 720;
 
+        if (isTV) {
+            console.log(">>> APPLYING 1080p DENSITY HACK <<<");
+
+            var body = document.body;
+            var root = document.getElementById('root'); // Spotify's main container
+
+            // STEP 1: FIX ALIGNMENT
+            // Force Left-to-Right to prevent it getting stuck in the top-right corner
+            document.documentElement.style.direction = "ltr";
+            body.style.direction = "ltr";
+
+            // STEP 2: EXPAND THE CANVAS (The "Browser Zoom" Simulator)
+            // We tell the container it is 150% wide. 
+            // 1280px * 1.5 = 1920px. 
+            // The App sees 1920px and renders the High-Res Desktop Layout.
+            body.style.width = "150%";
+            body.style.height = "150%";
+            
+            // Ensure the internal React root fills this new huge space
+            if (root) {
+                root.style.width = "100%";
+                root.style.height = "100%";
+            }
+
+            // STEP 3: SHRINK TO FIT (The "CSS Zoom")
+            // We scale the whole thing down by 0.666 to fit back into the TV screen.
+            // 150% * 0.666 = 100% (Perfect Fit)
+            body.style.zoom = "0.66666667";
+        }
+    })();
+</script>
 </body>
 </html>
+
